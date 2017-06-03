@@ -1,0 +1,16 @@
+- const tachyons = "https://unpkg.com/tachyons@4.7.0/css/tachyons.min.css"
+
+html
+    head 
+        title smart selection app 
+        link(rel="stylesheet" href=tachyons)
+
+
+    body
+        h1 smart selection app
+        p This tool is for running a script over responses to the FAC application form in order to get a better overview within a spreadsheet
+        
+        .section-start
+            include partials/start-initial
+            include partials/start-confirm
+            include partials/start-reset
