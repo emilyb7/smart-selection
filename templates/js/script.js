@@ -98,6 +98,7 @@
   const confirmQuestions = () => {
     state = Object.assign({}, state, { step: 3 })
     render()
+    console.log('confirm')
   }
 
   const setSource = e => {
