@@ -66,3 +66,23 @@ const renderSections = (sections, step) => {
     hide(section)
   })
 }
+
+const disableAll = () => {
+  const elements = [].slice
+    .call(document.querySelectorAll('button'), 0)
+    .concat([].slice.call(document.querySelectorAll('select'), 0))
+  elements.forEach(e => { e.disabled = true })
+}
+
+const waterfall = (args, tasks, cb) => {
+  var nextTask = tasks[0]
+  var remainingTasks = tasks.slice(1)
+  if (typeof nextTask !== 'undefined') {
+    nextTask(args, (result) => {
+      if (result.error) return cb(result.error)
+      return waterfall(result.success, remainingTasks, cb)
+    })
+    return
+  }
+  return cb(null, args)
+}

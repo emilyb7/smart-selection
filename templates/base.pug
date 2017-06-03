@@ -1,13 +1,13 @@
 - const tachyons = "https://unpkg.com/tachyons@4.7.0/css/tachyons.min.css"
 
-html
+html.h-100
     head 
         title smart selection app 
         link(rel="stylesheet" href=tachyons)
 
     body
         h1 smart selection app
-        p This tool is for running a script over responses to the FAC application form in order to get a better overview within a spreadsheet
+        p This tool is for running a script over responses to the FAC application form in order to get a better overview within a spreadsheet. Your spreadsheet will be automatically updated via the Google Scripts API. You must have write access to the sheet you are trying to update.
         
         #section-start.h4
             include partials/start-initial
@@ -20,8 +20,12 @@ html
         #questions-section
              include partials/questions
              
-        #update-section
+        #update-section.vh-50
              include partials/update
+             
+        footer.light-blue
+             | This app was made by Emily for Founders & Coders. You can view the code and full documentation on
+             a(href="github.com/emilyb7/smart-selection" target="_blank") GitHub
         
         script
               include js/methods.js

@@ -23,7 +23,9 @@
     source: '',
     output: '',
     confirmed: false,
-    step: 0
+    step: 0,
+    updatePending: false,
+    messages: []
   }
 
   let state = Object.assign({}, defaultState)
@@ -59,6 +61,22 @@
         .call(document.querySelectorAll('.qu-partial'), 0)
 
       showQuestionsSection(quPartials, state.sheetNames, state.questionsCreated)
+    }
+
+    if (state.step === 3 && state.updatePending) {
+      disableAll()
+      if (state.messages.length) {
+        const messagesList = document.querySelector('#messages')
+        while (messagesList.hasChildNodes()) {
+          messagesList.removeChild(messagesList.firstChild)
+        }
+        state.messages.forEach(msg => {
+          console.log(msg)
+          let item = document.createElement('li')
+          item.textContent = msg
+          messagesList.appendChild(item)
+        })
+      }
     }
   }
 
@@ -120,10 +138,75 @@
   }
 
   function updateSheet () {
+    state.updatePending = true
+    state.messages = state.messages.concat(['Your sheet is being updated. This may take several minutes. Please do not try to make any changes to the setup or to your spreadsheet until the update has finished.'])
+    render()
+
+    const tasks = [
+      updateWithCallback,
+      insertData,
+      insertCodewarsData,
+      updateEligibility,
+      applyFormatting
+    ]
+
+    waterfall(null, tasks, () => {
+      state.messages = state.messages.concat(['finished! Thanks for using my app. You may now safely close or refresh the page.'])
+      console.log('yay!')
+    })
+  }
+
+  const updateWithCallback = (_, cb) => {
     google.script.run.withSuccessHandler(function (done) {
-      if (done) console.log('success')
-      else console.log('failure')
-    }).updateForeignSS(state.sheetId, state.source, state.output)
+      if (done.success) {
+        state.messages = state.messages.concat([done.success])
+        cb(done.success)
+        render()
+      } else console.log('failure')
+    }).setUpSheet(state.sheetId, state.output)
+  }
+
+  const insertData = (_, cb) => {
+    state.messages = state.messages.concat(['processing applicant data - this is the slowest part'])
+    google.script.run.withSuccessHandler(function (done) {
+      if (done.success) {
+        state.messages = state.messages.concat([done.success])
+        cb(done.success)
+        render()
+      } else console.log('failure')
+    }).insertData(state.sheetId, state.source, state.output)
+  }
+
+  const insertCodewarsData = (_, cb) => {
+    google.script.run.withSuccessHandler(function (done) {
+      if (done.success) {
+        state.messages = state.messages.concat([done.success])
+        cb(done.success)
+        render()
+      } else console.log('failure')
+    }).insertCodewarsData(state.sheetId, state.output)
+  }
+
+  const updateEligibility = (_, cb) => {
+    google.script.run.withSuccessHandler(function (done) {
+      if (done.success) {
+        state.messages = state.messages.concat([done.success])
+        cb(done.success)
+        render()
+      } else console.log('failure')
+    }).evaluateCriteria(state.sheetId, state.output)
+  }
+
+  const applyFormatting = (_, cb) => {
+    google.script.run.withSuccessHandler(function (done) {
+      if (done.success) {
+        state.messages = state.messages.concat([done.success])
+        cb(done.success)
+        render()
+      } else {
+        console.log('failure')
+      }
+    }).applyFormatting(state.sheetId, state.output)
   }
 
   confirmBtn.addEventListener('click', confirm)
