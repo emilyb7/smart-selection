@@ -1,70 +1,46 @@
 (function () {
-  let defaultState = {
+  const startSection = document.querySelector('#section-start')
+  const startDetails = document.querySelector('#start-reset')
+  const startConfirm = document.querySelector('#start-confirm')
+  const startInitial = document.querySelector('#start-initial')
+  const confirmBtn = document.querySelector('#confirm')
+  const cancelBtn = document.querySelector('#cancel')
+  const selectSource = document.querySelector('#select-source')
+  const selectOuput = document.querySelector('#select-output')
+  const sheetDetails = document.querySelector('#details-section')
+  const questionsSection = document.querySelector('#questions-section')
+  const updateSection = document.querySelector('#update-section')
+
+  const startSections = [ startDetails, startConfirm, startInitial ]
+
+  const stepSections = [ startSection, sheetDetails, questionsSection, updateSection ]
+
+  const defaultState = {
     url: '',
     sheetId: '',
     sheetName: '',
     sheetNames: [],
     source: '',
     output: '',
-    confirmed: false
+    confirmed: false,
+    step: 0
   }
 
-  var state = Object.assign({}, defaultState)
-
-  function show (el) { return el.classList.remove('dn') }
-
-  function hide (el) { return el.classList.add('dn') }
-
-  function getStartSection (id, confirmed) {
-    if (!id.length) return 'start-initial'
-    if (id.length && !confirmed) return 'start-confirm'
-    return 'start-reset'
-  }
-
-  function showStartSection (sections) {
-    var section = getStartSection(state.sheetId, state.confirmed)
-    sections.forEach(sec => {
-      if (sec.id === section) show(sec)
-      else hide(sec)
-    })
-  }
+  let state = Object.assign({}, defaultState)
 
   function render () {
     console.log(state)
-    var startDetails = document.querySelector('#start-reset')
-    var startConfirm = document.querySelector('#start-confirm')
-    var startInitial = document.querySelector('#start-initial')
-    var sheetUrl = document.querySelector('#sheet-url')
-    var selectSource = document.querySelector('#select-source')
-    var selectOuput = document.querySelector('#select-output')
-    var sheetDetails = document.querySelector('#details-section')
-    var questionsSection = document.querySelector('#questions-section')
-    var updateSection = document.querySelector('#update-section')
 
-    var startSections = [ startDetails, startConfirm, startInitial ]
-    showStartSection(startSections)
+    renderSections(stepSections, state.step)
 
-    sheetUrl.value = state.url
+    showStartSection(startSections, state.sheetId, state.confirmed, state.url, state.sheetName)
 
-    if (state.sheetId.length) {
-      document.querySelector('#sheetname').innerHTML = state.sheetName
-    } else {
-      sheetDetails.classList.add('dn')
-      questionsSection.classList.add('dn')
-      updateSection.classList.add('dn')
-    }
-
-    if (state.confirmed) {
-      show(sheetDetails)
-
-      if (state.sheetNames.length && state.confirmed && !selectSource.hasChildNodes()) {
-        updateSelectFields('select-source', state.sheetNames)
-      }
+    if (state.sheetNames.length && state.confirmed && !selectSource.hasChildNodes()) {
+      updateSelectFields('select-source', state.sheetNames)
     }
 
     if (state.source.length) {
       selectSource.value = state.source
-
       selectOuput.disabled = false
 
       if (!selectOuput.hasChildNodes()) {
@@ -74,29 +50,50 @@
 
     if (state.output) {
       selectOuput.value = state.output
+      document.getElementById('confirm-sheets').disabled = false
     }
 
-    if (state.sheetNames && state.source && state.output) {
-      show(questionsSection)
+    if (state.step === 2 && state.sheetNames.length) {
+      const quPartials = []
+        .slice
+        .call(document.querySelectorAll('.qu-partial'), 0)
 
-      if (state.sheetNames.indexOf('questions') > -1) {
-        document.querySelector('#has-question-sheet').classList.remove('dn')
-        document.querySelector('#no-question-sheet').classList.add('dn')
-        updateSection.classList.remove('dn')
-      } else {
-        document.querySelector('#no-question-sheet').classList.remove('dn')
-        document.querySelector('#has-question-sheet').classList.add('dn')
-      }
+      showQuestionsSection(quPartials, state.sheetNames, state.questionsCreated)
     }
   }
 
-  function confirm () {
-    state.confirmed = true
+  const confirm = () => {
+    state = Object.assign({}, state, { confirmed: true, step: 1 })
     render()
   }
 
-  function cancel () {
+  const cancel = () => {
     state = Object.assign({}, defaultState)
+    render()
+  }
+
+  const confirmSheets = () => {
+    state = Object.assign({}, state, { step: 2 })
+    render()
+  }
+
+  const confirmQuestions = () => {
+    state = Object.assign({}, state, { step: 3 })
+    render()
+  }
+
+  const setSource = e => {
+    state.source = e.target.value
+    render()
+  }
+
+  const setOutput = e => {
+    state.output = e.target.value
+    render()
+  }
+
+  const setUrl = e => {
+    state.url = e.target.value
     render()
   }
 
@@ -111,69 +108,37 @@
     }).getSheetName(state.url)
   }
 
-  function updateSelectFields (id, sheetNames) {
-    var field = document.getElementById(id)
-    while (field.hasChildNodes()) {
-      field.removeChild(field.firstChild)
-    }
-
-    var blank = document.createElement('option')
-    field.appendChild(blank)
-
-    sheetNames.forEach(function (name) {
-      var o = document.createElement('option')
-      o.innerHTML = name
-      o.value = name
-      field.appendChild(o)
-    })
-    render()
-  }
-
-  function setUrl (e) {
-    state.url = e.target.value
-    render()
-  }
-
-  function setSource (e) {
-    state.source = e.target.value
-    render()
-  }
-
-  function setOutput (e) {
-    state.output = e.target.value
-    render()
-  }
-
   function createQuestions () {
     var sheetId = state.sheetId
     google.script.run.withSuccessHandler(function (done) {
       if (done) {
         console.log('success')
-        state.sheetNames = state.sheetNames.concat('questions')
+        state.questionsCreated = true
       } else console.log('failure')
       render()
     }).createQuestionsSheet(sheetId)
   }
 
   function updateSheet () {
-    var source = document.querySelector('#select-source').value
-    var output = document.querySelector('#select-output').value
-
     google.script.run.withSuccessHandler(function (done) {
       if (done) console.log('success')
       else console.log('failure')
-    }).updateForeignSS(state.sheetId, source, output)
+    }).updateForeignSS(state.sheetId, state.source, state.output)
   }
 
-  document.querySelector('#confirm').addEventListener('click', confirm)
-  document.querySelector('#cancel').addEventListener('click', cancel)
+  confirmBtn.addEventListener('click', confirm)
+  cancelBtn.addEventListener('click', cancel)
+  document.querySelectorAll('.confirm-questions').forEach(el => {
+    el.addEventListener('click', confirmQuestions)
+  })
   document.querySelector('#startover').addEventListener('click', cancel)
   document.querySelector('#check-sheet').addEventListener('click', checkSheet)
-  document.querySelector('#select-source').addEventListener('change', setSource)
-  document.querySelector('#select-output').addEventListener('change', setOutput)
+  selectSource.addEventListener('change', setSource)
+  selectOuput.addEventListener('change', setOutput)
   document.querySelector('#create-questions').addEventListener('click', createQuestions)
   document.querySelector('#sheet-url').addEventListener('change', setUrl)
   document.querySelector('#update').addEventListener('click', updateSheet)
+  document.querySelector('#confirm-sheets').addEventListener('click', confirmSheets)
 
   render()
 })()
