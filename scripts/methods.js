@@ -39,7 +39,6 @@ function checkLink (url) {
 function yesNo (value) { return bool(value.toLowerCase().indexOf('yes') > -1) }
 
 function abv_rightToWork (str) {
-  Logger.log(str)
   return str.indexOf('UK') > -1
   ? 'UK'
   : str.indexOf('Israel') > -1
