@@ -18,7 +18,7 @@ Col3: an optional *method* to be applied to the results - see below
 
 ### Available methods
 
-Methods are defined in `.scripts/methods.js`. Even without making changes to this project, you can make use of the following methods:
+Methods are defined in `.scripts/methods.js`. Even without making changes to this project, you can make use of the following methods. Methods take a single string (i.e. response from the form) as an input, and return a single string.
 
 - `gitify`: takes a candidate's GitHub handle, checks URL for HTTP response, returns either a link to their profile or an error
 - `codewarsify`: takes a candidate's Codewars username, checks URL for HTTP response, returns either a link to their profile or an error
