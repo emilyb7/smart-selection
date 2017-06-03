@@ -19,7 +19,6 @@ function getSheetName (url) {
 }
 
 function createQuestionsSheet (id) {
-  var sourceSS = SpreadsheetApp.openByUrl('https://docs.google.com/spreadsheets/d/1PkA_OFGjly-XpuDCe3DutgCQhjMMHOCSoUxBTkC71y8/edit#gid=0')
   var sheet = sourceSS.getSheetByName('questions')
   var template = sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn()).getValues()
 
