@@ -2,3 +2,4 @@ gapps.config.json
 node_modules
 src/index.html
 src/Code.js
+config.json
