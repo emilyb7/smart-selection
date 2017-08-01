@@ -38,6 +38,8 @@ Both sets of code need to be compiled.
 
 To compile the project and push up to your Google project, run `npm run update`
 
+It's not possible to run the app locally. The test version is here: https://script.google.com/macros/s/AKfycbznr5_fcSrtVirTWr2_dlM-ey6ffXtwBS7rc3cv8Kwa/dev
+
 
 ## Tech stack
 
