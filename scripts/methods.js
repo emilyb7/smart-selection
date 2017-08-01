@@ -4,7 +4,7 @@
 function gitify (handle) {
   if (handle.indexOf('github') > -1) return handle
   var url = 'https://github.com/' + handle
-  return urlChecker(url, handle)
+  return urlChecker(url, handle) // eslint-disable-line no-undef
 }
 
 // returns url of codewars profile and checks for errors
@@ -12,21 +12,24 @@ function codewarsify (handle) {
   if (handle.indexOf('codewars') > -1) return handle
   if (handle.length < 2) return handle
   var url = 'https://www.codewars.com/users/' + handle
-  return urlChecker(url, handle)
+  return urlChecker(url, handle) // eslint-disable-line no-undef
 }
 
 // returns url of FFC
 function getFCCLink (handle) {
   if (handle.indexOf('freecodecamp') > -1) return handle
   var url = 'https://www.freecodecamp.com/' + handle
-  return urlChecker(url, handle)
+  return urlChecker(url, handle) // eslint-disable-line no-undef
 }
 
 // generic link checking function
 function checkLink (url) {
   if (!url || url.split(' ').length > 1) return '✘'
   try {
-    var response = UrlFetchApp.fetch(url, { muteHttpExceptions: true }).getResponseCode()
+    // eslint-disable-next-line no-undef
+    var response = UrlFetchApp.fetch(url, {
+      muteHttpExceptions: true
+    }).getResponseCode()
   } catch (err) {
     return err + url
   }
@@ -36,34 +39,42 @@ function checkLink (url) {
 }
 
 // returns boolean value for yes no answers
-function yesNo (value) { return bool(value.toLowerCase().indexOf('yes') > -1) }
+function yesNo (value) {
+  return bool(value.toLowerCase().indexOf('yes') > -1) // eslint-disable-line no-undef
+}
 
 function abv_rightToWork (str) {
   return str.indexOf('UK') > -1
-  ? 'UK'
-  : str.indexOf('Israel') > -1
-  ? 'IL'
-  : 'no'
+    ? 'UK'
+    : str.indexOf('Israel') > -1 ? 'IL' : 'no'
 }
 
-function checkCodingQuestion (answer) { return bool(answer === 'A = 20, B = 20') }
+function checkCodingQuestion (answer) {
+  return bool(answer === 'A = 20, B = 20') // eslint-disable-line no-undef
+}
 
 // abbreviates responses to question about educational background
 function abv_education (str) {
-  return str.indexOf('bachelor') > -1 ? "Bachelor's"
-  : str.indexOf('master') > -1 ? "Master's"
-  : str.indexOf('PhD') > -1 ? 'PhD'
-  : 'High school'
+  return str.indexOf('bachelor') > -1
+    ? "Bachelor's"
+    : str.indexOf('master') > -1
+      ? "Master's"
+      : str.indexOf('PhD') > -1 ? 'PhD' : 'High school'
 }
 
 // abbreviates responses to question about plans post FAC
 function abv_plans (str) {
-  return str.indexOf('freelance') > -1 ? 'freelance'
-  : str.indexOf('job') > -1 ? 'apply for job'
-  : str.indexOf('startup ideas with other') > -1 ? 'startup ideas with others'
-  : str.indexOf('own startup idea') > -1 ? 'own startup idea'
-  : str.indexOf('previous occupation') > -1 ? 'previous ocucpation'
-  : 'other'
+  return str.indexOf('freelance') > -1
+    ? 'freelance'
+    : str.indexOf('job') > -1
+      ? 'apply for job'
+      : str.indexOf('startup ideas with other') > -1
+        ? 'startup ideas with others'
+        : str.indexOf('own startup idea') > -1
+          ? 'own startup idea'
+          : str.indexOf('previous occupation') > -1
+            ? 'previous ocucpation'
+            : 'other'
 }
 
 var method1 = { name: 'gitify', fn: gitify }
@@ -76,4 +87,14 @@ var method7 = { name: 'checkCodingQuestion', fn: checkCodingQuestion }
 var method8 = { name: 'abv_education', fn: abv_education }
 var method9 = { name: 'abv_plans', fn: abv_plans }
 
-var methods = [ method1, method2, method3, method4, method5, method6, method7, method8, method9 ]
+var methods = [
+  method1,
+  method2,
+  method3,
+  method4,
+  method5,
+  method6,
+  method7,
+  method8,
+  method9
+]
